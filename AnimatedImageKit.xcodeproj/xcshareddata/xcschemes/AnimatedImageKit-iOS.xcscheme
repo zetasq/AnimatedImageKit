@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D4DAD0181FB84155000352F2"
-               BuildableName = "AnimatedImageKit_iOS.framework"
+               BuildableName = "AnimatedImageKit.framework"
                BlueprintName = "AnimatedImageKit-iOS"
                ReferencedContainer = "container:AnimatedImageKit.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D4DAD0181FB84155000352F2"
-            BuildableName = "AnimatedImageKit_iOS.framework"
+            BuildableName = "AnimatedImageKit.framework"
             BlueprintName = "AnimatedImageKit-iOS"
             ReferencedContainer = "container:AnimatedImageKit.xcodeproj">
          </BuildableReference>
@@ -67,7 +67,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D4DAD0181FB84155000352F2"
-            BuildableName = "AnimatedImageKit_iOS.framework"
+            BuildableName = "AnimatedImageKit.framework"
             BlueprintName = "AnimatedImageKit-iOS"
             ReferencedContainer = "container:AnimatedImageKit.xcodeproj">
          </BuildableReference>
@@ -85,7 +85,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D4DAD0181FB84155000352F2"
-            BuildableName = "AnimatedImageKit_iOS.framework"
+            BuildableName = "AnimatedImageKit.framework"
             BlueprintName = "AnimatedImageKit-iOS"
             ReferencedContainer = "container:AnimatedImageKit.xcodeproj">
          </BuildableReference>

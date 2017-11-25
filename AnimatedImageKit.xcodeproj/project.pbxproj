@@ -7,10 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D485E4561FC9B17000B5B44F /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485E4551FC9B17000B5B44F /* AnimatedImageView.swift */; };
+		D485E4581FC9C23300B5B44F /* Int+GCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485E4571FC9C23300B5B44F /* Int+GCD.swift */; };
 		D4DAD0231FB84155000352F2 /* AnimatedImageKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DAD0191FB84155000352F2 /* AnimatedImageKit.framework */; };
 		D4DAD02A1FB84155000352F2 /* AnimatedImageKit_iOS.h in Headers */ = {isa = PBXBuildFile; fileRef = D4DAD01C1FB84155000352F2 /* AnimatedImageKit_iOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4DAD0341FB841FE000352F2 /* AnimatedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0331FB841FE000352F2 /* AnimatedImage.swift */; };
 		D4DAD0371FB84218000352F2 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0351FB84214000352F2 /* SampleTests.swift */; };
+		D4DAD0391FB854D4000352F2 /* AnimatedImageDebugDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0381FB854D4000352F2 /* AnimatedImageDebugDelegate.swift */; };
+		D4DAD03D1FB85EA8000352F2 /* WeakProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD03C1FB85EA8000352F2 /* WeakProxy.swift */; };
+		D4DAD0B31FB8844C000352F2 /* MessageQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0B21FB8844C000352F2 /* MessageQueue.swift */; };
+		D4DAD0B51FB88ACD000352F2 /* MessageItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0B41FB88ACD000352F2 /* MessageItem.swift */; };
+		D4DAD0FA1FC1854E000352F2 /* NSRecursiveLock+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0F91FC1854E000352F2 /* NSRecursiveLock+Sync.swift */; };
+		D4DAD0FC1FC18687000352F2 /* ObjC+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0FB1FC18687000352F2 /* ObjC+Sync.swift */; };
+		D4DAD0FE1FC1A09C000352F2 /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DAD0FD1FC1A09C000352F2 /* logger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,6 +33,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D485E4551FC9B17000B5B44F /* AnimatedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageView.swift; sourceTree = "<group>"; };
+		D485E4571FC9C23300B5B44F /* Int+GCD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+GCD.swift"; sourceTree = "<group>"; };
 		D4DAD0191FB84155000352F2 /* AnimatedImageKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnimatedImageKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4DAD01C1FB84155000352F2 /* AnimatedImageKit_iOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedImageKit_iOS.h; sourceTree = "<group>"; };
 		D4DAD01D1FB84155000352F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -31,6 +42,13 @@
 		D4DAD0291FB84155000352F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4DAD0331FB841FE000352F2 /* AnimatedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImage.swift; sourceTree = "<group>"; };
 		D4DAD0351FB84214000352F2 /* SampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTests.swift; sourceTree = "<group>"; };
+		D4DAD0381FB854D4000352F2 /* AnimatedImageDebugDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageDebugDelegate.swift; sourceTree = "<group>"; };
+		D4DAD03C1FB85EA8000352F2 /* WeakProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakProxy.swift; sourceTree = "<group>"; };
+		D4DAD0B21FB8844C000352F2 /* MessageQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageQueue.swift; sourceTree = "<group>"; };
+		D4DAD0B41FB88ACD000352F2 /* MessageItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageItem.swift; sourceTree = "<group>"; };
+		D4DAD0F91FC1854E000352F2 /* NSRecursiveLock+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSRecursiveLock+Sync.swift"; sourceTree = "<group>"; };
+		D4DAD0FB1FC18687000352F2 /* ObjC+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjC+Sync.swift"; sourceTree = "<group>"; };
+		D4DAD0FD1FC1A09C000352F2 /* logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +110,14 @@
 		D4DAD0311FB84159000352F2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				D4DAD0F81FC1853E000352F2 /* Utils */,
+				D4DAD0B11FB87D81000352F2 /* MessageQueue */,
 				D4DAD0331FB841FE000352F2 /* AnimatedImage.swift */,
+				D485E4551FC9B17000B5B44F /* AnimatedImageView.swift */,
+				D485E4571FC9C23300B5B44F /* Int+GCD.swift */,
+				D4DAD03C1FB85EA8000352F2 /* WeakProxy.swift */,
+				D4DAD0381FB854D4000352F2 /* AnimatedImageDebugDelegate.swift */,
+				D4DAD0FD1FC1A09C000352F2 /* logger.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -103,6 +128,24 @@
 				D4DAD0351FB84214000352F2 /* SampleTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		D4DAD0B11FB87D81000352F2 /* MessageQueue */ = {
+			isa = PBXGroup;
+			children = (
+				D4DAD0B21FB8844C000352F2 /* MessageQueue.swift */,
+				D4DAD0B41FB88ACD000352F2 /* MessageItem.swift */,
+			);
+			path = MessageQueue;
+			sourceTree = "<group>";
+		};
+		D4DAD0F81FC1853E000352F2 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D4DAD0F91FC1854E000352F2 /* NSRecursiveLock+Sync.swift */,
+				D4DAD0FB1FC18687000352F2 /* ObjC+Sync.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,7 +258,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D485E4581FC9C23300B5B44F /* Int+GCD.swift in Sources */,
+				D4DAD03D1FB85EA8000352F2 /* WeakProxy.swift in Sources */,
+				D4DAD0FA1FC1854E000352F2 /* NSRecursiveLock+Sync.swift in Sources */,
+				D485E4561FC9B17000B5B44F /* AnimatedImageView.swift in Sources */,
+				D4DAD0B51FB88ACD000352F2 /* MessageItem.swift in Sources */,
+				D4DAD0B31FB8844C000352F2 /* MessageQueue.swift in Sources */,
+				D4DAD0391FB854D4000352F2 /* AnimatedImageDebugDelegate.swift in Sources */,
+				D4DAD0FC1FC18687000352F2 /* ObjC+Sync.swift in Sources */,
 				D4DAD0341FB841FE000352F2 /* AnimatedImage.swift in Sources */,
+				D4DAD0FE1FC1A09C000352F2 /* logger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
