@@ -11,12 +11,12 @@ import UIKit
 
   public protocol AnimatedImageDebugDelegate: class {
     
-    func debug_animatedImage(_ animatedImage: AnimatedImage, didUpdateCachedFrames indicesOfFramesInCache: IndexSet)
+    func debug_animatedImage(_ animatedImage: AnimatedImage, didUpdateCachedFramesAt cachedFramesIndices: IndexSet)
     
-    func debug_animatedImage(_ animatedImage: AnimatedImage, didRequestCachedFrame index: Int)
+    func debug_animatedImage(_ animatedImage: AnimatedImage, didRequestCachedFrameAt index: Int)
     
-    func debug_animatedImagePredrawingSlowdownFactor(_ animatedImage: AnimatedImage) -> Double
-    
+//    func debug_animatedImagePredrawingSlowdownFactor(_ animatedImage: AnimatedImage) -> Double
+//    
   }
   
 #endif

@@ -8,7 +8,7 @@
 import Foundation
 
 internal func GCD(_ a: Int, _ b: Int) -> Int {
-  guard a > b else {
+  guard a >= b else {
     return GCD(b, a)
   }
   

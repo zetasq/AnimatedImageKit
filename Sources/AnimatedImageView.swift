@@ -2,67 +2,24 @@
 //  AnimatedImageView.swift
 //  AnimatedImageKit-iOS
 //
-//  Created by Zhu Shengqi on 25/11/2017.
+//  Created by Zhu Shengqi on 16/12/2017.
 //
 
 import UIKit
-import os.log
-
-#if DEBUG
-  public protocol AnimatedImageViewDebugDelegate: class {
-    
-    func debug_animatedImageView(_ animatedImageView: AnimatedImageView, waitingForFrameAt index: Int, duration: TimeInterval)
-    
-  }
-#endif
 
 public final class AnimatedImageView: UIImageView {
-  
   // MARK: - Class Methods
   private static var defaultRunLoopMode: RunLoopMode {
     return ProcessInfo.processInfo.activeProcessorCount > 1 ? .commonModes : .defaultRunLoopMode
   }
   
   // MARK: - Public Properties
-  public var animatedImage: AnimatedImage? {
-    didSet {
-      guard animatedImage !== oldValue else {
-        return
-      }
-      
-      if animatedImage != nil {
-        super.image = nil
-        super.isHighlighted = false
-        invalidateIntrinsicContentSize()
-      } else {
-        stopAnimating()
-      }
-      
-      currentFrame = animatedImage?.posterImage
-      currentFrameIndex = 0
-      
-      if (animatedImage?.loopCount ?? 0) > 0 {
-        loopCountdown = animatedImage?.loopCount ?? 0
-      } else {
-        loopCountdown = .max
-      }
-      
-      accumulator = 0
-      
-      updateShouldAnimate()
-      if shouldAnimate {
-        startAnimating()
-      }
-      
-      layer.setNeedsDisplay()
-    }
-  }
-  
-  public var loopCompletionBlock: ((Int) -> Void)?
-  
-  public private(set) var currentFrame: UIImage?
+  #if DEBUG
+  public weak var debugDelegate: AnimatedImageViewDebugDelegate?
+  #endif
   
   public private(set) var currentFrameIndex: Int = 0
+  public private(set) var lastFrameImage: UIImage?
   
   public var runLoopMode: RunLoopMode = AnimatedImageView.defaultRunLoopMode {
     didSet {
@@ -73,20 +30,16 @@ public final class AnimatedImageView: UIImageView {
     }
   }
   
-  // MARK: - Private Properties
-  private var loopCountdown: Int = 0
+  // MARK: Private Properties
+  private var _animatedImage: AnimatedImage?
   
-  private var accumulator: TimeInterval = 0
+  private var _loopCounter: LoopCounter = .init(loopCount: .infinity)
   
-  private var displayLink: CADisplayLink?
+  private var _accumulator: TimeInterval = 0
   
-  private var shouldAnimate: Bool = false
+  private var _animationDisplayLink: CADisplayLink?
   
-  private var needsDisplayWhenImageBecomesAvailable: Bool = false
-  
-  #if DEBUG
-  private weak var debug_delegate: AnimatedImageViewDebugDelegate?
-  #endif
+  private var _needsDisplayWhenImageBecomesAvailable: Bool = false
   
   // MARK: - Init & Deinit
   public override init(image: UIImage?) {
@@ -109,81 +62,63 @@ public final class AnimatedImageView: UIImageView {
   
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-
+    
     self.accessibilityIgnoresInvertColors = true
   }
   
   deinit {
-    displayLink?.invalidate()
+    _animationDisplayLink?.invalidate()
   }
   
-  // MARK: - View Hierarchy Changes
+  // MARK: - UIView Overrides
   public override func didMoveToSuperview() {
     super.didMoveToSuperview()
     
-    updateShouldAnimate()
-    if shouldAnimate {
-      startAnimating()
-    } else {
-      stopAnimating()
-    }
+    animateIfNeeded()
   }
   
   public override func didMoveToWindow() {
     super.didMoveToWindow()
     
-    updateShouldAnimate()
-    if shouldAnimate {
-      startAnimating()
-    } else {
-      stopAnimating()
-    }
+    animateIfNeeded()
   }
   
-  // MARK: - UIView Overrides
-  override public var alpha: CGFloat {
+  public override var alpha: CGFloat {
     didSet {
-      updateShouldAnimate()
-      if shouldAnimate {
-        startAnimating()
-      } else {
-        stopAnimating()
-      }
+      animateIfNeeded()
     }
   }
   
-  override public var isHidden: Bool {
+  public override var isHidden: Bool {
     didSet {
-      updateShouldAnimate()
-      if shouldAnimate {
-        startAnimating()
-      } else {
-        stopAnimating()
-      }
+      animateIfNeeded()
     }
   }
   
-  // MARK: - AutoLayout
   public override var intrinsicContentSize: CGSize {
-    var size = super.intrinsicContentSize
-    
     if animatedImage != nil {
-      size = image?.size ?? .zero
+      return image?.size ?? .zero
+    } else {
+      return super.intrinsicContentSize
     }
-    
-    return size
+  }
+  
+  public override func display(_ layer: CALayer) {
+    layer.contents = image?.cgImage
   }
   
   // MARK: - UIImageView Overrides
   public override var image: UIImage? {
     get {
-      if animatedImage != nil {
-        return currentFrame
+      if _animatedImage != nil {
+        return lastFrameImage
       } else {
         return super.image
       }
     }
     set {
+      stopAnimating()
+      
       if newValue != nil {
         animatedImage = nil
       }
@@ -191,58 +126,18 @@ public final class AnimatedImageView: UIImageView {
     }
   }
   
-  // MARK: - Animating Images
-  private func frameDelayGCD() -> TimeInterval {
-    let kGCDPrecision: TimeInterval = 2.0 / AnimatedImage.MinimumFrameDelayTime
-    
-    guard let delays = animatedImage?.delayTimesForIndices.values else {
-      return 0
-    }
-    
-    var scaledGCD = lrint((delays.first ?? 0) * kGCDPrecision)
-    for value in delays {
-      scaledGCD = GCD(lrint(value * kGCDPrecision), scaledGCD)
-    }
-    
-    return TimeInterval(scaledGCD) / kGCDPrecision
-  }
-  
-  public override func startAnimating() {
-    guard animatedImage != nil else {
-      super.startAnimating()
-      return
-    }
-    
-    if displayLink == nil {
-      let weakProxy = WeakProxy(target: self)
-      displayLink = CADisplayLink(target: weakProxy, selector: #selector(self.displayDidRefresh(_:)))
-      
-      displayLink!.add(to: .main, forMode: runLoopMode)
-    }
-    
-    let kDisplayRefreshRate: TimeInterval = 60
-    displayLink!.preferredFramesPerSecond = max(Int(frameDelayGCD() * kDisplayRefreshRate), 1)
-    
-    displayLink!.isPaused = false
-  }
-  
-  public override func stopAnimating() {
-    if animatedImage != nil {
-      displayLink?.isPaused = true
-    } else {
-      super.stopAnimating()
-    }
-  }
-  
   public override var isAnimating: Bool {
-    if animatedImage != nil {
-      return displayLink != nil && !displayLink!.isPaused
+    if _animatedImage != nil {
+      if let displayLink = _animationDisplayLink {
+        return !displayLink.isPaused
+      } else {
+        return false
+      }
     } else {
       return super.isAnimating
     }
   }
   
-  // MARK: - Highlighted Image Unsupported
   public override var isHighlighted: Bool {
     get {
       return super.isHighlighted
@@ -254,64 +149,135 @@ public final class AnimatedImageView: UIImageView {
     }
   }
   
-  // MARK: - Animation
-  private func updateShouldAnimate() {
-    let isVisible = window != nil && superview != nil && !isHidden && alpha > 0
-    shouldAnimate = animatedImage != nil && isVisible
+  public override func startAnimating() {
+    guard !isAnimating else {
+      return
+    }
+    
+    guard let currentAnimatedImage = _animatedImage else {
+      super.startAnimating()
+      return
+    }
+    
+    if _animationDisplayLink == nil {
+      let weakProxy = WeakProxy(target: self)
+      _animationDisplayLink = CADisplayLink(target: weakProxy, selector: #selector(self.displayLinkDidRefresh(_:)))
+      _animationDisplayLink!.add(to: .main, forMode: runLoopMode)
+    }
+
+    _animationDisplayLink!.preferredFramesPerSecond = max(1, min(60, Int(1.0 / currentAnimatedImage.frameDelayGCD)))
+    
+    _animationDisplayLink!.isPaused = false
   }
   
-  @objc
-  private func displayDidRefresh(_ displayLink: CADisplayLink) {
-    guard shouldAnimate else {
-      os_log("Trying to animate image when we shouldn't", log: animatedImage_log, type: .error)
+  public override func stopAnimating() {
+    guard isAnimating else {
       return
     }
     
-    guard let delayTime = animatedImage?.delayTimesForIndices[currentFrameIndex] else {
-      currentFrameIndex += 1
+    guard _animatedImage != nil else {
+      super.stopAnimating()
       return
     }
     
-    guard let image = animatedImage?.imageLazilyCached(at: currentFrameIndex) else {
-      os_log("Waiting for frame for animated image", log: animatedImage_log, type: .debug)
-      
-      #if DEBUG
-        debug_delegate?.debug_animatedImageView(self, waitingForFrameAt: currentFrameIndex, duration: displayLink.duration * TimeInterval(displayLink.preferredFramesPerSecond))
-      #endif
-      
-      return
+    _animationDisplayLink?.isPaused = true
+  }
+  
+  // MARK: - Public Methods
+  public var animatedImage: AnimatedImage? {
+    get {
+      return _animatedImage
     }
-    
-    os_log("Showing frame for animated image", log: animatedImage_log, type: .debug)
-    currentFrame = image
-    if needsDisplayWhenImageBecomesAvailable {
-      layer.setNeedsDisplay()
-      needsDisplayWhenImageBecomesAvailable = false
-    }
-    
-    accumulator += displayLink.duration * TimeInterval(displayLink.preferredFramesPerSecond)
-    
-    while accumulator >= delayTime {
-      accumulator -= delayTime
-      currentFrameIndex += 1;
+    set {
+      guard newValue !== _animatedImage else {
+        return
+      }
       
-      if currentFrameIndex >= animatedImage?.frameCount ?? 0 {
-        loopCountdown -= 1
-        loopCompletionBlock?(loopCountdown)
+      if let newAnimatedImage = newValue {
+        super.image = nil
+        super.isHighlighted = false
+        invalidateIntrinsicContentSize()
         
-        if loopCountdown == 0 {
+        currentFrameIndex = 0
+        lastFrameImage = newAnimatedImage.posterImage
+        
+        _loopCounter = .init(loopCount: newAnimatedImage.loopCount)
+      } else {
+        stopAnimating()
+        
+        currentFrameIndex = 0
+        lastFrameImage = nil
+        
+        _loopCounter = .init(loopCount: .infinity)
+      }
+      
+      _accumulator = 0
+      
+      _animatedImage = newValue
+      
+      layer.setNeedsDisplay()
+      animateIfNeeded()
+    }
+  }
+  
+  
+  // MARK: - Action Handlers
+  @objc
+  private func displayLinkDidRefresh(_ displayLink: CADisplayLink) {
+    guard isAnimating else {
+      return
+    }
+    
+    guard let currentAnimatedImage = _animatedImage else {
+      return
+    }
+    
+    let displayLinkFireInterval = displayLink.duration * 60 / TimeInterval(displayLink.preferredFramesPerSecond)
+    
+    if let cachedImage = currentAnimatedImage.imageCached(at: currentFrameIndex) {
+      lastFrameImage = cachedImage
+      
+      if _needsDisplayWhenImageBecomesAvailable {
+        layer.setNeedsDisplay()
+        internalLog(.info, "display image at: \(currentFrameIndex)")
+        _needsDisplayWhenImageBecomesAvailable = false
+      }
+    } else {
+      #if DEBUG
+        debugDelegate?.debug_animatedImageView(self, waitingForFrameAt: currentFrameIndex, duration: displayLinkFireInterval)
+      #endif
+    }
+    
+    var delayTime = currentAnimatedImage.frameDelays[currentFrameIndex]
+    
+    _accumulator += displayLinkFireInterval
+    
+    while _accumulator >= delayTime {
+      _accumulator -= delayTime
+      currentFrameIndex = (currentFrameIndex + 1) % currentAnimatedImage.frameCount
+      delayTime = currentAnimatedImage.frameDelays[currentFrameIndex]
+      
+      if currentFrameIndex == 0 {
+        _loopCounter.increaseCount()
+        
+        if _loopCounter.finished {
           stopAnimating()
           return
         }
-        
-        currentFrameIndex = 0
       }
       
-      needsDisplayWhenImageBecomesAvailable = true
+      _needsDisplayWhenImageBecomesAvailable = true
     }
   }
   
-  public override func display(_ layer: CALayer) {
-    layer.contents = image?.cgImage
+  // MARK: - Private Methods
+  private func animateIfNeeded() {
+    let isVisible = window != nil && !isHidden && alpha > 0
+    
+    if _animatedImage != nil && isVisible {
+      startAnimating()
+    } else {
+      stopAnimating()
+    }
   }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class WeakProxy<T: NSObject>: NSObject {
+public final class WeakProxy<T: NSObjectProtocol>: NSObject {
   
   private weak var target: T?
   
@@ -17,11 +17,11 @@ internal class WeakProxy<T: NSObject>: NSObject {
     super.init()
   }
   
-  override func responds(to aSelector: Selector!) -> Bool {
+  public override func responds(to aSelector: Selector!) -> Bool {
     return (target?.responds(to: aSelector) ?? false) || super.responds(to: aSelector)
   }
   
-  override func forwardingTarget(for aSelector: Selector!) -> Any? {
+  public override func forwardingTarget(for aSelector: Selector!) -> Any? {
     return target
   }
   
