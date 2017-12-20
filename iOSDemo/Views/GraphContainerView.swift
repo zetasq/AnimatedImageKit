@@ -94,6 +94,7 @@ final class GraphContainerView: UIView {
   private lazy var descriptionLabel: UILabel = {
     let descLabel = UILabel()
     
+    descLabel.text = self.style.hint
     descLabel.numberOfLines = 0
     descLabel.backgroundColor = .clear
     descLabel.textColor = UIColor(white: 0.8, alpha: 1)
@@ -126,8 +127,12 @@ final class GraphContainerView: UIView {
     canvasView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
     
     canvasView.addArrangedSubview(graphView)
+    graphView.translatesAutoresizingMaskIntoConstraints = false
+    graphView.heightAnchor.constraint(equalTo: canvasView.heightAnchor).isActive = true
     
     canvasView.addArrangedSubview(axisLabelStackView)
+    axisLabelStackView.translatesAutoresizingMaskIntoConstraints = false
+    axisLabelStackView.heightAnchor.constraint(equalTo: canvasView.heightAnchor).isActive = true
     do {
       axisLabelStackView.addArrangedSubview(topYAxisLabel)
       axisLabelStackView.addArrangedSubview(bottomYAxisLabel)

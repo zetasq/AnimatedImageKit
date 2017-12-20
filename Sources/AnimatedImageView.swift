@@ -239,7 +239,6 @@ public final class AnimatedImageView: UIImageView {
       
       if _needsDisplayWhenImageBecomesAvailable {
         layer.setNeedsDisplay()
-        internalLog(.info, "display image at: \(currentFrameIndex)")
         _needsDisplayWhenImageBecomesAvailable = false
       }
     } else {

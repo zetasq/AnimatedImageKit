@@ -155,7 +155,7 @@ public final class AnimatedImage {
       if couldIncreaseThreshold {
         if let lastWarningTimestamp = self._backgroundLastMemoryWarningTimestamp {
           let now = Timestamp()
-          let safeInterval = Int(5 + arc4random_uniform(5))
+          let safeInterval = Int(5 + arc4random_uniform(10))
           
           if now.seconds(since: lastWarningTimestamp) > safeInterval {
             
@@ -209,6 +209,8 @@ public final class AnimatedImage {
     guard let cgImage = _imageSource.image(at: index) else {
       return nil
     }
+    
+    internalLog(.info, "decoding image at \(index)")
     
     let uiImage = UIImage(cgImage: cgImage)
     return uiImage.predrawImage() ?? uiImage
