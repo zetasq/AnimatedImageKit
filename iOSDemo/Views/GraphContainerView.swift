@@ -67,7 +67,7 @@ final class GraphContainerView: UIView {
     
     return axisLabelStackView
   }()
-
+  
   private lazy var topYAxisLabel: UILabel = {
     let axisLabel = UILabel()
     
@@ -105,6 +105,8 @@ final class GraphContainerView: UIView {
     return descLabel
   }()
   
+  private var maxDataPointObservation: NSKeyValueObservation?
+  
   init(style: Style) {
     self.style = style
     
@@ -112,6 +114,14 @@ final class GraphContainerView: UIView {
     
     isOpaque = false
     setupUI()
+    
+    maxDataPointObservation = graphView.observe(\.maxDataPoint, options: [.initial, .new]) { [weak self] _, change in
+      guard let `self` = self else {
+        return
+      }
+      
+      self.topYAxisLabel.text = String.init(format: "%.1f", change.newValue!)
+    }
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -120,7 +130,7 @@ final class GraphContainerView: UIView {
   
   private func setupUI() {
     self.addSubview(canvasView)
- canvasView.translatesAutoresizingMaskIntoConstraints = false
+    canvasView.translatesAutoresizingMaskIntoConstraints = false
     canvasView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
     canvasView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
     canvasView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true

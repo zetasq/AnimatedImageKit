@@ -36,7 +36,7 @@ class RootViewController: UIViewController {
     imageView1.clipsToBounds = true
     imageView1.isUserInteractionEnabled = true
     
-    let animatedImage1 = AnimatedImage(fileName: "rock", bundle: .main, frameCachePolicy: .limited(count: 0))!
+    let animatedImage1 = AnimatedImage(fileName: "rock", bundle: .main, frameCachePolicy: .limited(count: 5))!
     imageView1.animatedImage = animatedImage1
     
     let debugView1 = DebugView(style: .default)

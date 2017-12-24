@@ -234,6 +234,8 @@ public final class AnimatedImageView: UIImageView {
     
     let displayLinkFireInterval = displayLink.duration * 60 / TimeInterval(displayLink.preferredFramesPerSecond)
     
+    _accumulator += displayLinkFireInterval
+
     if let cachedImage = currentAnimatedImage.imageCached(at: currentFrameIndex) {
       lastFrameImage = cachedImage
       
@@ -241,31 +243,26 @@ public final class AnimatedImageView: UIImageView {
         layer.setNeedsDisplay()
         _needsDisplayWhenImageBecomesAvailable = false
       }
+      
+      if _accumulator >= currentAnimatedImage.frameDelays[currentFrameIndex] {
+        _accumulator = 0
+        currentFrameIndex = (currentFrameIndex + 1) % currentAnimatedImage.frameCount
+        
+        if currentFrameIndex == 0 {
+          _loopCounter.increaseCount()
+          
+          if _loopCounter.finished {
+            stopAnimating()
+            return
+          }
+        }
+        
+        _needsDisplayWhenImageBecomesAvailable = true
+      }
     } else {
       #if DEBUG
         debugDelegate?.debug_animatedImageView(self, waitingForFrameAt: currentFrameIndex, duration: displayLinkFireInterval)
       #endif
-    }
-    
-    var delayTime = currentAnimatedImage.frameDelays[currentFrameIndex]
-    
-    _accumulator += displayLinkFireInterval
-    
-    while _accumulator >= delayTime {
-      _accumulator -= delayTime
-      currentFrameIndex = (currentFrameIndex + 1) % currentAnimatedImage.frameCount
-      delayTime = currentAnimatedImage.frameDelays[currentFrameIndex]
-      
-      if currentFrameIndex == 0 {
-        _loopCounter.increaseCount()
-        
-        if _loopCounter.finished {
-          stopAnimating()
-          return
-        }
-      }
-      
-      _needsDisplayWhenImageBecomesAvailable = true
     }
   }
   

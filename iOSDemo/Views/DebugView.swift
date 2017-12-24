@@ -34,6 +34,7 @@ final class DebugView: UIView {
       memoryUsageView.graphView.maxDataPoint = image.size.width * image.size.height * CGFloat(4 * image.frameCount) / CGFloat(1024 * 1024)
       
       frameDelayView.graphView.numberOfDisplayedDataPoints = image.frameCount * 3
+      frameDelayView.graphView.maxDataPoint = 5
       
       frameCacheView.image = image
     }
@@ -221,7 +222,7 @@ final class DebugView: UIView {
       }, completion: nil)
       
       memoryUsageView.graphView.add(animatedImage.memoryUsage)
-      frameDelayView.graphView.add(CGFloat(currentFrameDelay))
+      frameDelayView.graphView.add(CGFloat(currentFrameDelay * 1000))
       currentFrameDelay = 0
     }
   }

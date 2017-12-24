@@ -22,6 +22,8 @@ final class GraphView: UIView {
     }
   }
   
+  @objc
+  dynamic
   var maxDataPoint: CGFloat = 100 {
     didSet {
       if maxDataPoint <= 0 {
