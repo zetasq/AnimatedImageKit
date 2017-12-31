@@ -9,7 +9,7 @@ import Foundation
 
 extension AnimatedImage {
   
-  public convenience init?(fileName: String, bundle: Bundle, frameCachePolicy: FrameCachePolicy = .greedy) {
+  public convenience init?(fileName: String, bundle: Bundle = .main, frameCachePolicy: FrameCachePolicy = .greedy) {
     guard let url = bundle.url(forResource: fileName, withExtension: "gif") else {
       return nil
     }

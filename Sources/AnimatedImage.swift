@@ -74,7 +74,7 @@ public final class AnimatedImage {
   private var _backgroundLastRequestedFrameIndex: Int?
   private var _backgroundCachedFrameIndices: IndexSet = IndexSet()
   private var _backgroundMaxCachedFrameCount: Int
-  private var _backgroundLastMemoryWarningTimestamp: Timestamp?
+  private var _backgroundExpandCacheSafePivot: Timestamp?
   
   // MARK: - Init & Deinit
   public init?(gifData: Data, frameCachePolicy: FrameCachePolicy = .greedy) {
@@ -153,12 +153,8 @@ public final class AnimatedImage {
       }
       
       if couldIncreaseThreshold {
-        if let lastWarningTimestamp = self._backgroundLastMemoryWarningTimestamp {
-          let now = Timestamp()
-          let safeInterval = Int(5 + arc4random_uniform(10))
-          
-          if now.seconds(since: lastWarningTimestamp) > safeInterval {
-            
+        if let safePivot = self._backgroundExpandCacheSafePivot {
+          if Timestamp() > safePivot {
             self._backgroundMaxCachedFrameCount += 1
           }
         } else {
@@ -226,7 +222,10 @@ public final class AnimatedImage {
         return
       }
       
-      self._backgroundLastMemoryWarningTimestamp = Timestamp()
+      var warningTimestamp = Timestamp()
+      warningTimestamp.add(seconds: Int(5 + arc4random_uniform(10)))
+      
+      self._backgroundExpandCacheSafePivot = warningTimestamp
       
       guard self._backgroundCachedFrameIndices.count > 1 else {
         return
