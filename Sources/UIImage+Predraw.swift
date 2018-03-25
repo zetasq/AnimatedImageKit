@@ -18,13 +18,13 @@ extension UIImage {
     // (source: docs "Quartz 2D Programming Guide > Graphics Contexts > Table 2-1 Pixel formats supported for bitmap graphics contexts")
     let numberOfComponents = deviceRGBColorSpace.numberOfComponents + 1 // 4: RGB + A
     
-    let width = Int(self.size.width)
-    let height = Int(self.size.height)
+    let widthInPixel = Int(self.size.width * self.scale)
+    let heightInPixel = Int(self.size.height * self.scale)
     let bitsPerComponent = Int(CHAR_BIT)
     
     let bitsPerPixel = bitsPerComponent * numberOfComponents
     let bytesPerPixel = bitsPerPixel / Int(BYTE_SIZE)
-    let bytesPerRow = bytesPerPixel * width
+    let bytesPerRow = bytesPerPixel * widthInPixel
     
     var alphaInfo = self.cgImage!.alphaInfo
     // If the alpha info doesn't match to one of the supported formats (see above), pick a reasonable supported one.
@@ -39,20 +39,20 @@ extension UIImage {
     
     // Create our own graphics context to draw to; `UIGraphicsGetCurrentContext`/`UIGraphicsBeginImageContextWithOptions` doesn't create a new context but returns the current one which isn't thread-safe (e.g. main thread could use it at the same time).
     // Note: It's not worth caching the bitmap context for multiple frames ("unique key" would be `width`, `height` and `hasAlpha`), it's ~50% slower. Time spent in libRIP's `CGSBlendBGRA8888toARGB8888` suddenly shoots up -- not sure why.
-    guard let bitmapContext = CGContext(data: nil, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: deviceRGBColorSpace, bitmapInfo: alphaInfo.rawValue) else {
+    guard let bitmapContext = CGContext(data: nil, width: widthInPixel, height: heightInPixel, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: deviceRGBColorSpace, bitmapInfo: alphaInfo.rawValue) else {
       internalLog(.error, "Failed to call CGBitmapContextCreate")
 
       return nil
     }
     
     // Draw image in bitmap context and create image by preserving receiver's properties.
-    bitmapContext.draw(self.cgImage!, in: CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height))
+    bitmapContext.draw(self.cgImage!, in: CGRect(x: 0, y: 0, width: widthInPixel, height: heightInPixel))
     guard let predrawnCGImage = bitmapContext.makeImage() else {
       internalLog(.error, "Failed to call CGBitmapContextCreateImage")
       return nil
     }
     
-    let predrawnUIImage = UIImage(cgImage: predrawnCGImage, scale: self.scale, orientation: self.imageOrientation)
+    let predrawnUIImage = UIImage(cgImage: predrawnCGImage, scale: UIScreen.main.scale, orientation: self.imageOrientation)
     
     return predrawnUIImage
   }

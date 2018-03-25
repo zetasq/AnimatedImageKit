@@ -27,8 +27,8 @@ public final class GIFImageSource {
       internalLog(.error, "Empty GIF data when calling \(#function)")
       return nil
     }
-
-    guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, [kCGImageSourceShouldCache: false] as CFDictionary) else {
+    
+    guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, [kCGImageSourceTypeIdentifierHint: kUTTypeGIF, kCGImageSourceShouldCache: false] as CFDictionary) else {
       internalLog(.error, "Failed to create \(CGImageSource.self) when calling \(#function)")
       return nil
     }
